@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة X O المستقبلية</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#0f172a; color:#fff;
+           display:flex; flex-direction:column; align-items:center;
+           justify-content:center; height:100vh; margin:0; }
+    h1 { margin-bottom:20px; color:#38bdf8; }
+    .board { display:grid; grid-template: repeat(3,100px) / repeat(3,100px);
+             gap:10px; }
+    .cell { background:#334155; border-radius:8px; box-shadow:0 0 10px #94a3b8;
+            display:flex; align-items:center; justify-content:center;
+            font-size:2rem; cursor:pointer; transition:.2s; }
+    .cell:hover { background:#475569; }
+    #message { margin-top:20px; font-size:1.2rem; color:#38bdf8; }
+    button { margin-top:20px; padding:10px 20px; font-size:1rem;
+             background:#38bdf8; border:none; border-radius:5px;
+             cursor:pointer; }
+  </style>
+</head>
+<body>
+  <h1>لعبة X O المستقبلية</h1>
+  <div class="board" id="board"></div>
+  <div id="message"></div>
+  <button onclick="startGame()">إعادة اللعب</button>
+  <script>
+    let b, p, over, root = document.getElementById('board'),
+        msg = document.getElementById('message');
+    function startGame(){
+      b=Array(9).fill(''); p='X'; over=false;
+      msg.textContent='دور اللاعب X'; root.innerHTML='';
+      for(let i=0;i<9;i++){
+        let c=document.createElement('div');
+        c.className='cell'; c.dataset.i=i;
+        c.addEventListener('click',clickCell);
+        root.appendChild(c);
+      }
+    }
+    function clickCell(e){
+      let i=e.target.dataset.i;
+      if(over||b[i]) return;
+      b[i]=p; e.target.textContent=p;
+      if([[0,1,2],[3,4,5],[6,7,8],
+          [0,3,6],[1,4,7],[2,5,8],
+          [0,4,8],[2,4,6]].some(c=>c.every(x=>b[x]===p))){
+        msg.textContent=`${p} فاز!`; over=true; return;
+      }
+      if(!b.includes('')){
+        msg.textContent='تعادل!'; over=true; return;
+      }
+      p = p==='X'?'O':'X';
+      msg.textContent=`دور اللاعب ${p}`;
+      if(p==='O') setTimeout(aiMove,300);
+    }
+    function aiMove(){
+      let avail=b.map((v,i)=>v===''?i:null).filter(x=>x!=null),
+          m=avail[Math.floor(Math.random()*avail.length)];
+      b[m]=p; root.children[m].textContent=p;
+      if([[0,1,2],[3,4,5],[6,7,8],
+          [0,3,6],[1,4,7],[2,5,8],
+          [0,4,8],[2,4,6]].some(c=>c.every(x=>b[x]===p))){
+        msg.textContent='الكمبيوتر فاز!'; over=true; return;
+      }
+      p='X'; msg.textContent=`دور اللاعب ${p}`;
+    }
+    startGame();
+  </script>
+</body>
+</html>
